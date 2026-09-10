@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.11', '3.12' ]
+    env:
+      TEST_MODE: 'true'
+      OPENAI_API_KEY: ''
+      ANTHROPIC_API_KEY: ''
+      TAVILY_API_KEY: ''
+      STREAMLIT_SERVER_PORT: '8501'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-html black isort flake8 mypy pip-audit pytest-playwright pytest-html
+
+    - name: Install Playwright browsers
+      run: |
+        python -m playwright install --with-deps
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 'lts/*'
+
+    - name: Create logs directory
+      run: mkdir -p logs
+
+    - name: Start backend (uvicorn)
+      run: |
+        nohup .venv/bin/python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 > logs/backend.log 2>&1 &
+      env:
+        TEST_MODE: ${{ env.TEST_MODE }}
+
+    - name: Wait for backend health
+      run: |
+        for i in {1..30}; do
+          if curl -sSf http://127.0.0.1:8000/health; then
+            echo 'backend healthy'
+            exit 0
+          fi
+          sleep 1
+        done
+        cat logs/backend.log || true
+        exit 1
+
+    - name: Start frontend (Streamlit)
+      run: |
+        nohup .venv/bin/streamlit run frontend/app.py --server.port $STREAMLIT_SERVER_PORT > logs/frontend.log 2>&1 &
+
+    - name: Wait for frontend
+      run: |
+        for i in {1..30}; do
+          if curl -sSf http://127.0.0.1:8501; then
+            echo 'frontend ready'
+            exit 0
+          fi
+          sleep 1
+        done
+        cat logs/frontend.log || true
+        exit 1
+
+    - name: Code quality - black/isort/flake8/mypy
+      run: |
+        black --check .
+        isort --check-only .
+        flake8 . || true
+        mypy . || true
+
+    - name: Security audit
+      run: |
+        pip-audit --progress=off --ignore-vuln  || true
+
+    - name: Run unit and integration tests
+      run: |
+        pytest -q --maxfail=1 --disable-warnings --junitxml=results/junit.xml --cov=./ --cov-report=xml:results/coverage.xml --cov-report=html:results/coverage_html
+
+    - name: Run Playwright E2E tests
+      run: |
+        python -m pytest tests/test_e2e_ui.py -q --junitxml=results/playwright-junit.xml --html=results/playwright-report.html
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-artifacts
+        path: |
+          results/**
+          logs/**
+          coverage_html/**
+        retention-days: 14
+
+    - name: Upload Playwright screenshots (if any)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-screenshots
+        path: playwright-report/**
+        retention-days: 14
