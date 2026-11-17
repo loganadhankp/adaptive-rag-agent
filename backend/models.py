@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(..., max_length=50000, description="User prompt or query")
     conversation_id: str | None = None
     model: str | None = None
-    temperature: float = 0.7
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     provider: str | None = None
 
 

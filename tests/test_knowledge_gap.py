@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from langgraph_workflow.nodes.knowledge_gap import (
+from backend.workflow.nodes.knowledge_gap import (
     analyze_knowledge_gap,
     build_gap_explanation,
 )
-from prompts.knowledge_gap import KnowledgeGapAnalysis
+from backend.prompts.knowledge_gap import KnowledgeGapAnalysis
 
 
 class TestKnowledgeGap(unittest.TestCase):
@@ -154,7 +154,7 @@ class TestKnowledgeGap(unittest.TestCase):
         self.assertIn('Knowledge Base Mismatch', result['generation'])
         self.assertEqual(result['knowledge_gap']['abstention_type'], 'irrelevant')
 
-    @patch('langgraph_workflow.nodes.knowledge_gap.get_llm')
+    @patch('backend.workflow.nodes.knowledge_gap.get_llm')
     def test_fully_answerable_case(self, mock_get_llm):
         mock_llm_instance = MagicMock()
         mock_get_llm.return_value.with_structured_output.return_value = mock_llm_instance

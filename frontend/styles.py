@@ -1,201 +1,148 @@
 CUSTOM_CSS = """
 /* ==========================================================================
-   Google Fonts & Material Symbols
+Minimal ChatGPT / Gemini Layout (Zero Clutter)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* ==========================================================================
-   Clean Dark Minimal Base Layout (ChatGPT / Gemini Dark Style)
-   ========================================================================== */
-header {visibility: hidden !important;}
-footer {visibility: hidden !important;}
-#MainMenu {visibility: hidden !important;}
+/* Hide all Streamlit boilerplate and headers */
+header, footer, #MainMenu, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"] {
+    display: none !important;
+    visibility: hidden !important;
+}
 
+/* Hide Sidebar completely */
+[data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {
+    display: none !important;
+    width: 0px !important;
+    visibility: hidden !important;
+}
+
+/* Base Body & App */
 .stApp {
-    background-color: #0f172a !important;
-    color: #f1f5f9 !important;
+    background-color: #212121 !important;
+    color: #ececec !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* Material Symbols Helper */
-.material-symbols-outlined {
-    font-family: 'Material Symbols Outlined' !important;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 1;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* Main Container Centering & Max Width */
+/* Center Chat Area */
 .main .block-container {
-    max-width: 840px !important;
-    padding-top: 1.5rem !important;
-    padding-bottom: 2rem !important;
+    max-width: 768px !important;
+    padding-top: 2.5rem !important;
+    padding-bottom: 7.5rem !important;
     margin: 0 auto !important;
 }
 
-/* ==========================================================================
-   Top Header (Knowledge Assistant)
-   ========================================================================== */
-.top-header {
-    text-align: center;
-    padding: 10px 0 16px 0;
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.top-header-title {
-    font-family: 'Geist', 'Inter', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: #f8fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    letter-spacing: -0.02em;
-}
-
-.top-header-subtitle {
-    font-size: 13px;
-    color: #94a3b8;
-    margin-top: 4px;
-    line-height: 1.4;
-}
-
-/* ==========================================================================
-   Sidebar Styling (Clean Minimal)
-   ========================================================================== */
-section[data-testid="stSidebar"] {
-    background-color: #0b1120 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
-    width: 300px !important;
-}
-
-section[data-testid="stSidebar"] .block-container {
-    padding: 1.25rem 1rem !important;
-}
-
-.sidebar-app-title {
-    font-family: 'Geist', 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #f8fafc;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 12px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.sidebar-section-header {
-    font-size: 11px;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 18px 0 8px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Document Row in Sidebar */
-.kb-doc-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 12px;
-}
-
-.kb-doc-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
-    flex: 1;
-}
-
-.kb-doc-name {
-    color: #e2e8f0;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.kb-doc-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    font-weight: 600;
-    padding: 2px 5px;
-    border-radius: 3px;
-    background: rgba(56, 189, 248, 0.12);
-    color: #38bdf8;
-}
-
-.kb-doc-status {
-    font-size: 10px;
-    color: #10b981;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-/* ==========================================================================
-   Chat Messages (User & Assistant)
-   ========================================================================== */
+/* User Message */
 .user-msg-row {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .user-msg-bubble {
-    background-color: #1e293b !important;
-    color: #f1f5f9 !important;
-    padding: 10px 16px !important;
-    border-radius: 18px 18px 4px 18px !important;
-    max-width: 80% !important;
-    font-size: 14px !important;
+    background-color: #2f2f2f !important;
+    color: #ececec !important;
+    padding: 10px 18px !important;
+    border-radius: 20px !important;
+    max-width: 75% !important;
+    font-size: 14.5px !important;
     line-height: 1.5 !important;
     word-wrap: break-word !important;
-    border: 1px solid rgba(255, 255, 255, 0.06) !important;
-    margin-left: auto !important;
 }
 
+/* Assistant Message */
 .bot-msg-row {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     width: 100%;
 }
 
 .bot-msg-body {
     background: transparent !important;
-    color: #f1f5f9 !important;
-    font-size: 14px !important;
+    color: #e5e7eb !important;
+    font-size: 14.5px !important;
     line-height: 1.65 !important;
     width: 100% !important;
+    word-break: break-word !important;
 }
+
+.bot-msg-body h1, .bot-msg-body h2, .bot-msg-body h3, .bot-msg-body h4 {
+    color: #f9fafb !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    margin-top: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.bot-msg-body h1 { font-size: 1.45rem !important; }
+.bot-msg-body h2 { 
+    font-size: 1.25rem !important; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-bottom: 6px !important;
+}
+.bot-msg-body h3 { font-size: 1.1rem !important; }
+.bot-msg-body h4 { font-size: 0.95rem !important; }
 
 .bot-msg-body p {
     margin-bottom: 10px !important;
+    color: #e5e7eb !important;
+    line-height: 1.65 !important;
+}
+
+.bot-msg-body strong, .bot-msg-body b {
+    color: #ffffff !important;
+    font-weight: 600 !important;
 }
 
 .bot-msg-body ul, .bot-msg-body ol {
-    margin-left: 20px !important;
-    margin-bottom: 10px !important;
+    margin: 0.4rem 0 0.85rem 1.4rem !important;
+    padding-left: 0.2rem !important;
+}
+
+.bot-msg-body li {
+    margin-bottom: 0.35rem !important;
+    line-height: 1.6 !important;
+    color: #e5e7eb !important;
+}
+
+.bot-msg-body blockquote {
+    border-left: 3px solid #6366f1 !important;
+    background: rgba(99, 102, 241, 0.08) !important;
+    padding: 8px 14px !important;
+    border-radius: 0 8px 8px 0 !important;
+    margin: 12px 0 !important;
+    color: #c7d2fe !important;
+}
+
+.bot-msg-body hr {
+    border: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    margin: 1.25rem 0 !important;
+}
+
+.bot-msg-body table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 14px 0 !important;
+    font-size: 13.5px !important;
+}
+
+.bot-msg-body th {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #f9fafb !important;
+    font-weight: 600 !important;
+    padding: 8px 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    text-align: left !important;
+}
+
+.bot-msg-body td {
+    padding: 8px 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #d1d5db !important;
 }
 
 .bot-msg-body code {
@@ -207,116 +154,31 @@ section[data-testid="stSidebar"] .block-container {
 }
 
 .bot-msg-body pre {
-    background: #0b1120 !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #171717 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 8px !important;
     padding: 12px !important;
-    margin: 10px 0 !important;
+    margin: 12px 0 !important;
 }
 
-/* ==========================================================================
-   Sources & Citations Box
-   ========================================================================== */
-.sources-card {
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    width: 100%;
-}
-
-.sources-card-header {
-    font-size: 11px;
-    font-weight: 600;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.source-entry {
-    font-size: 12px;
-    color: #cbd5e1;
-    margin-bottom: 3px;
-    line-height: 1.4;
-}
-
-.source-entry a {
-    color: #38bdf8;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.source-entry a:hover {
-    text-decoration: underline;
-}
-
-.web-source-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: #38bdf8;
-    background: rgba(56, 189, 248, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-}
-
-/* ==========================================================================
-   Answer Details / Verification (Optional Collapsible)
-   ========================================================================== */
-.verification-container {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #94a3b8;
-}
-
-.verification-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 3px;
-    color: #cbd5e1;
-    font-size: 12px;
-}
-
-.verification-item .check-icon {
-    color: #10b981;
-    font-weight: bold;
-}
-
-.verification-score-badge {
-    margin-top: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #f1f5f9;
-}
-
-/* ==========================================================================
-   Dynamic Status Indicator
-   ========================================================================== */
+/* Dynamic Status Indicator */
 .dynamic-status-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    color: #94a3b8;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 6px 12px;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 5px 12px;
     border-radius: 20px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .status-dot {
     width: 6px;
     height: 6px;
-    background: #38bdf8;
+    background: #60a5fa;
     border-radius: 50%;
     animation: pulse-dot 1.5s infinite;
 }
@@ -327,88 +189,111 @@ section[data-testid="stSidebar"] .block-container {
     100% { opacity: 0.4; transform: scale(0.9); }
 }
 
-/* ==========================================================================
-   Empty State Welcome Hero
-   ========================================================================== */
-.welcome-hero {
-    text-align: center;
-    padding: 40px 20px 20px 20px;
-    max-width: 640px;
-    margin: 0 auto;
-}
-
-.welcome-hero-title {
-    font-family: 'Geist', 'Inter', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: #f8fafc;
-    letter-spacing: -0.03em;
+/* Sufficiency Badges */
+.badge-sufficient {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
     margin-bottom: 8px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-.welcome-hero-sub {
-    font-size: 14px;
-    color: #94a3b8;
-    margin-bottom: 24px;
-    line-height: 1.5;
+.badge-partially-sufficient {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
-/* ==========================================================================
-   Chat Input Bar & Buttons
-   ========================================================================== */
-.stChatInputContainer textarea {
-    background-color: #1e293b !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 14px !important;
-    color: #f1f5f9 !important;
-    font-size: 14px !important;
+.badge-insufficient {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: rgba(249, 115, 22, 0.12);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.25);
 }
 
-.stChatInputContainer textarea:focus {
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 0 1px #38bdf8 !important;
+.badge-irrelevant {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
-.stButton > button {
-    border-radius: 8px !important;
+/* Streamlit Bottom Chat Input Bar */
+div[data-testid="stBottom"] {
+    background-color: #212121 !important;
+}
+
+div[data-testid="stBottom"] > div {
+    max-width: 768px !important;
+    margin: 0 auto !important;
+}
+
+div[data-testid="stChatInput"] {
+    border-radius: 24px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background-color: #2f2f2f !important;
+}
+
+div[data-testid="stChatInput"]:focus-within {
+    border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+div[data-testid="stChatInput"] textarea {
+    color: #ececec !important;
+    font-size: 14.5px !important;
+}
+
+/* Fixed Upload Document Button at Bottom-Left */
+.fixed-bottom-left-upload {
+    position: fixed !important;
+    bottom: 22px !important;
+    left: 24px !important;
+    z-index: 99999 !important;
+}
+
+.fixed-bottom-left-upload div[data-testid="stPopover"] > button {
+    background-color: #2f2f2f !important;
+    color: #ececec !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 20px !important;
+    padding: 8px 14px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.15s ease !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    background-color: #1e293b !important;
-    color: #e2e8f0 !important;
 }
 
-.stButton > button:hover {
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    background-color: #334155 !important;
+.fixed-bottom-left-upload div[data-testid="stPopover"] > button:hover {
+    background-color: #383838 !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
-}
-
-.stButton > button[kind="primary"] {
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-    border: none !important;
-}
-
-.stButton > button[kind="primary"]:hover {
-    background-color: #1d4ed8 !important;
-}
-
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
 }
 """
-
-

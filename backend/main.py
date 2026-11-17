@@ -1,6 +1,8 @@
+import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from agents.llm_factory import get_vector_store
+from backend.agents.llm_factory import get_vector_store
 from backend.config import settings
 from backend.database.connection import DatabaseManager
 from backend.database.repository import Repository
@@ -11,7 +13,20 @@ from backend.services.analytics_service import AnalyticsService
 from backend.services.chat_service import ChatService
 from backend.services.kb_service import KnowledgeBaseService
 
+# Ensure necessary directories exist
+os.makedirs(settings.DOCUMENTS_DIR, exist_ok=True)
+os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
+
 app = FastAPI(title="Adaptive RAG Agent")
+
+# Enable CORS for local and web frontends
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 try:
     vector_store = get_vector_store()

@@ -25,20 +25,22 @@ class TestAPI(unittest.TestCase):
     def test_get_conversations(self, mock_get):
         mock_get.return_value = [{"id": "1", "title": "Test Chat"}]
         response = client.get("/api/chat/conversations")
-        self.assertIn(response.status_code, (200, 500))
+        self.assertEqual(response.status_code, 200)
 
     @patch("backend.main.app.state.analytics_service.get_summary")
     def test_get_analytics_summary(self, mock_summary):
         mock_summary.return_value = {
             "total_conversations": 10,
             "total_messages": 0,
+            "total_queries": 0,
             "retrieval_success_rate": 0.0,
             "query_rewrites_count": 0,
             "web_search_count": 0,
+            "hallucination_failures_count": 0,
             "avg_answer_quality": 0.0,
         }
         response = client.get("/api/analytics/summary")
-        self.assertIn(response.status_code, (200, 500))
+        self.assertEqual(response.status_code, 200)
 
     @patch("backend.main.app.state.kb_service.list_documents")
     def test_get_kb_documents(self, mock_docs):
@@ -49,10 +51,11 @@ class TestAPI(unittest.TestCase):
                 "file_type": "pdf",
                 "chunk_count": 1,
                 "uploaded_at": "2024-01-01T00:00:00",
+                "conversation_id": None,
             }
         ]
         response = client.get("/api/kb/documents")
-        self.assertIn(response.status_code, (200, 500))
+        self.assertEqual(response.status_code, 200)
 
     @patch("backend.main.app.state.analytics_service.get_summary")
     def test_metrics_endpoint(self, mock_summary):

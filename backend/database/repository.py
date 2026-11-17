@@ -74,6 +74,10 @@ class ChatRepository:
     ) -> dict:
         msg_id = id or str(uuid.uuid4())
         now = self._now()
+        if isinstance(content, list):
+            content = "\n".join(str(c) for c in content)
+        elif content is not None and not isinstance(content, str):
+            content = str(content)
         sources_str = json.dumps(sources) if sources else None
         workflow_str = json.dumps(workflow_metadata) if workflow_metadata else None
         with self.db_manager.get_connection() as conn:
@@ -181,11 +185,15 @@ class ChatRepository:
                 1 for e in events if e["event_type"] == "hallucination_failure"
             )
 
-            quality_events = [
-                json.loads(e["event_data"]).get("score", 0)
-                for e in events
-                if e["event_type"] == "answer_quality" and e["event_data"]
-            ]
+            quality_events = []
+            for e in events:
+                if e["event_type"] == "answer_quality" and e["event_data"]:
+                    try:
+                        d = json.loads(e["event_data"])
+                        if isinstance(d, dict) and "score" in d:
+                            quality_events.append(float(d["score"]))
+                    except Exception:
+                        pass
             avg_quality = (
                 sum(quality_events) / len(quality_events) if quality_events else 0.0
             )

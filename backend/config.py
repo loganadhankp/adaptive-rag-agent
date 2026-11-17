@@ -12,15 +12,16 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "gemini-3.5-flash-lite"
     EMBEDDING_MODEL: str = "models/gemini-embedding-001"
     CHROMA_COLLECTION_NAME: str = "knowledge_base"
-    MAX_RETRIEVAL_RESULTS: int = 4
+    MAX_RETRIEVAL_RESULTS: int = 8
     MAX_RETRIES: int = 2
 
-    SQLITE_DB_PATH: str = "database/chat_history.db"
+    SQLITE_DB_PATH: str = "data/chat_history.db"
     DOCUMENTS_DIR: str = "data/documents"
     CHROMA_PERSIST_DIR: str = "data/vector_db"
 
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 200
+    MAX_UPLOAD_SIZE_BYTES: int = 25 * 1024 * 1024
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

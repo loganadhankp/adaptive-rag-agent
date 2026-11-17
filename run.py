@@ -3,19 +3,14 @@ import signal
 import subprocess
 import sys
 import time
-
 import requests
 from dotenv import load_dotenv
-
-
 def create_directories():
     """Create necessary data directories."""
-    directories = ["data/documents", "data/vector_db", "database"]
+    directories = ["data/documents", "data/vector_db"]
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
         print(f"Ensured directory exists: {directory}")
-
-
 def get_python_executable():
     """Prefer .venv python if available."""
     if os.name == "nt":
@@ -25,8 +20,6 @@ def get_python_executable():
     if os.path.exists(venv_py):
         return venv_py
     return sys.executable
-
-
 def wait_for_backend(url="http://localhost:8000/health", timeout=30):
     """Wait for the backend to become healthy."""
     print(f"Waiting for backend at {url}...")
@@ -42,8 +35,6 @@ def wait_for_backend(url="http://localhost:8000/health", timeout=30):
         time.sleep(1)
     print("Timeout waiting for backend.")
     return False
-
-
 def wait_for_frontend(url="http://localhost:8501", timeout=30):
     """Wait for the frontend to become ready."""
     print(f"Waiting for frontend at {url}...")
@@ -58,8 +49,6 @@ def wait_for_frontend(url="http://localhost:8501", timeout=30):
             pass
         time.sleep(1)
     return False
-
-
 def main():
     print("=" * 60)
     print("Starting Adaptive RAG Agent System")
@@ -142,7 +131,5 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         cleanup()
-
-
 if __name__ == "__main__":
     main()

@@ -1,13 +1,13 @@
 from unittest.mock import MagicMock, patch
 
-from langgraph_workflow.nodes.web_search import web_search
+from backend.workflow.nodes.web_search import web_search
 
 
 def test_web_search_invokes_tavily(monkeypatch):
     # Ensure env key is set so the node attempts to run
     monkeypatch.setenv("TAVILY_API_KEY", "testkey")
 
-    with patch("langgraph_workflow.nodes.web_search.TavilySearchResults") as MockTavily:
+    with patch("backend.workflow.nodes.web_search.TavilySearchResults") as MockTavily:
         mock_instance = MagicMock()
         MockTavily.return_value = mock_instance
         mock_instance.invoke.return_value = [

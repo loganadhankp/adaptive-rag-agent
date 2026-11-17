@@ -81,15 +81,28 @@ To enable CI badges, replace `<OWNER>/<REPO>` in the badge URLs above with your 
 ## Project Structure
 ```text
 adaptive-rag-agent/
-├── backend/               # FastAPI server and API endpoints
-├── frontend/              # Streamlit UI
-├── agent/                 # LangGraph agent definitions
-├── data/                  # Local storage for DBs and documents
-│   ├── sample/            # Sample documents
-│   ├── vector_db/         # Chroma DB persistence
-│   └── documents/         # Uploaded document storage
+├── backend/               # FastAPI application & AI pipelines
+│   ├── agents/            # LLM & vector store factory
+│   ├── database/          # SQLite persistence & conversation repository
+│   ├── prompts/           # Prompts (sufficiency, generation, grading)
+│   ├── routers/           # FastAPI routers (/chat, /kb, /analytics)
+│   ├── services/          # Business logic services
+│   ├── workflow/          # LangGraph state graph, nodes, and routing
+│   ├── config.py          # App settings (Pydantic BaseSettings)
+│   ├── main.py            # FastAPI entrypoint
+│   └── models.py          # Data models and schemas
+├── frontend/              # Streamlit interactive UI
+│   ├── components/        # UI components (chat window, sidebar)
+│   ├── api_client.py      # HTTP & SSE client for FastAPI
+│   ├── app.py             # Streamlit application entrypoint
+│   └── styles.py          # Modern CSS styling
+├── data/                  # Persistent data storage
+│   ├── documents/         # Uploaded documents
+│   ├── vector_db/         # ChromaDB persistence
+│   └── chat_history.db    # SQLite conversation database
+├── tests/                 # Automated test suite (unit, integration, security)
 ├── requirements.txt       # Project dependencies
-├── run.py                 # Startup script
+├── run.py                 # Startup script (launches FastAPI & Streamlit)
 └── README.md              # Project documentation
 ```
 
@@ -97,8 +110,10 @@ adaptive-rag-agent/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `OPENAI_API_KEY` | OpenAI API key | None |
-| `LLM_PROVIDER` | LLM provider to use (`openai`, `anthropic`) | `openai` |
+| `GOOGLE_API_KEY` | Google Gemini API key (recommended) | None |
+| `LLM_PROVIDER` | LLM provider to use (`gemini`, `openai`, `anthropic`) | `gemini` |
+| `LLM_MODEL` | LLM model identifier | `gemini-3.5-flash-lite` |
+| `EMBEDDING_MODEL` | Embedding model identifier | `models/gemini-embedding-001` |
 | `CHUNK_SIZE` | Text chunk size for splitting | 1000 |
 | `CHUNK_OVERLAP` | Overlap between text chunks | 200 |
 | `MAX_RETRIES` | Max query rewrite retries | 2 |
@@ -106,7 +121,7 @@ adaptive-rag-agent/
 ## Tech Stack
 - **Frameworks:** FastAPI, Streamlit, LangChain, LangGraph
 - **Vector DB:** ChromaDB
-- **LLMs:** OpenAI (GPT-4o-mini), Anthropic (Claude)
+- **LLMs:** Google Gemini (Gemini 2.5/3.5), OpenAI, Anthropic
 - **Search:** Tavily API
 
 ## Deployment Notes
