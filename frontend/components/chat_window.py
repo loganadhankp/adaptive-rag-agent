@@ -3,18 +3,30 @@ import uuid
 import streamlit as st
 from frontend.testing_utils import add_testid
 
-def get_sufficiency_badge_html(metadata: dict) -> str:
-    """Returns empty string - suppresses diagnostic badge headers for clean ChatGPT-style interface."""
-    return ""
-
-def render_sufficiency_badge(metadata: dict):
-    """Renders colored evidence sufficiency badge into the current container."""
-    badge_html = get_sufficiency_badge_html(metadata)
-    if badge_html:
-        st.markdown(badge_html, unsafe_allow_html=True)
+def get_robot_hero_html() -> str:
+    return """
+    <div class="hero-header">
+        <svg width="84" height="84" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="50" y1="12" x2="50" y2="24" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="50" cy="10" r="5" fill="#1d4ed8"/>
+            <rect x="18" y="24" width="64" height="52" rx="26" fill="#ffffff" stroke="#1d4ed8" stroke-width="4"/>
+            <rect x="10" y="42" width="10" height="16" rx="5" fill="#1d4ed8"/>
+            <rect x="80" y="42" width="10" height="16" rx="5" fill="#1d4ed8"/>
+            <rect x="26" y="32" width="48" height="36" rx="18" fill="#0f172a"/>
+            <circle cx="39" cy="48" r="4.5" fill="#38bdf8"/>
+            <circle cx="61" cy="48" r="4.5" fill="#38bdf8"/>
+            <path d="M44 57 Q50 62 56 57" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M72 16 C72 11.58 76.48 8 82 8 C87.52 8 92 11.58 92 16 C92 20.42 87.52 24 82 24 C80.5 24 79.1 23.7 77.8 23.2 L74 25 L74.8 21.6 C73.1 20.1 72 18.2 72 16 Z" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+            <circle cx="78" cy="16" r="1.5" fill="#3b82f6"/>
+            <circle cx="82" cy="16" r="1.5" fill="#3b82f6"/>
+            <circle cx="86" cy="16" r="1.5" fill="#3b82f6"/>
+        </svg>
+        <div class="hero-title">Ask me anything about your documents!</div>
+        <div class="hero-subtitle">I'll find accurate answers using RAG with self-reflection.</div>
+    </div>
+    """
 
 def render_chat_window(api_client, settings):
-    """Minimal ChatGPT/Gemini style chat interface."""
     add_testid("chat-window")
 
     active_id = st.session_state.get("active_conversation_id")
@@ -27,70 +39,42 @@ def render_chat_window(api_client, settings):
 
     messages = st.session_state.messages.get(active_id, [])
 
+    st.markdown(get_robot_hero_html(), unsafe_allow_html=True)
+
     chat_container = st.container()
 
     with chat_container:
-        for i, msg in enumerate(messages):
-            role = msg.get("role", "user")
-            content = msg.get("content", "")
-            msg_meta = msg.get("metadata") or msg.get("workflow_metadata") or {}
+        if not messages:
+            st.markdown(
+                '<div class="chat-card-wrapper" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;"></div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            for i, msg in enumerate(messages):
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
 
-            if role == "user":
-                st.markdown(
-                    f'<div class="user-msg-row"><div class="user-msg-bubble">{html.escape(content)}</div></div>'
-                    f'<div data-testid="user-message" data-msg-idx="{i}" style="display:none"></div>',
-                    unsafe_allow_html=True,
-                )
-            else:
-                if msg_meta:
-                    render_sufficiency_badge(msg_meta)
-                st.markdown(
-                    f'<div class="bot-msg-row"><div class="bot-msg-body">\n\n{content}\n\n</div></div>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(
-                    f'<div data-testid="assistant-message" data-msg-idx="{i}" style="display:none"></div>',
-                    unsafe_allow_html=True,
-                )
-
-    st.markdown('<div class="fixed-bottom-left-upload">', unsafe_allow_html=True)
-    with st.popover("📎 Upload Document", help="Upload document to Knowledge Base"):
-        add_testid("kb-upload-button", visible=False)
-        uploaded_files = st.file_uploader(
-            "Select files",
-            type=["pdf", "docx", "txt", "md"],
-            accept_multiple_files=True,
-            key="fixed_kb_uploader",
-            label_visibility="collapsed",
-        )
-        if uploaded_files:
-            if st.button("Upload to Knowledge Base", key="btn_upload_fixed_docs", use_container_width=True):
-                with st.spinner("Indexing documents..."):
-                    for doc in uploaded_files:
-                        api_client.upload_document(
-                            doc.name, doc.getvalue(), doc.type, conversation_id=active_id
-                        )
-                st.toast(f"✓ Uploaded {len(uploaded_files)} document(s)")
-    st.markdown('</div>', unsafe_allow_html=True)
+                if role == "user":
+                    st.markdown(
+                        f'<div class="user-msg-row"><div class="user-msg-bubble">{html.escape(content)}</div></div>'
+                        f'<div data-testid="user-message" data-msg-idx="{i}" style="display:none"></div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        f'<div class="bot-msg-row"><div class="bot-msg-body">\n\n{content}\n\n</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                    st.markdown(
+                        f'<div data-testid="assistant-message" data-msg-idx="{i}" style="display:none"></div>',
+                        unsafe_allow_html=True,
+                    )
 
     add_testid("chat-input")
-    user_input = st.chat_input(
-        "Message...",
-        accept_file="multiple",
-        file_type=["pdf", "docx", "txt", "md"],
-    )
+    user_input = st.chat_input("Type your question here...")
 
     if user_input:
-        attached_files = getattr(user_input, "files", []) or []
-        for af in attached_files:
-            try:
-                api_client.upload_document(af.name, af.getvalue(), af.type, conversation_id=active_id)
-                st.toast(f"✓ Uploaded {af.name}")
-            except Exception:
-                pass
-
-        prompt_text = getattr(user_input, "text", None) or str(user_input)
-        prompt_text = prompt_text.strip() if isinstance(prompt_text, str) else ""
+        prompt_text = user_input.strip() if isinstance(user_input, str) else ""
 
         if prompt_text:
             messages.append({"role": "user", "content": prompt_text})
@@ -104,7 +88,6 @@ def render_chat_window(api_client, settings):
 
                 add_testid("typing-indicator", visible=False)
                 status_placeholder = st.empty()
-                badge_placeholder = st.empty()
                 message_placeholder = st.empty()
 
                 full_response = ""
@@ -162,9 +145,6 @@ def render_chat_window(api_client, settings):
                             )
                         elif event == "metadata":
                             metadata = data
-                            badge_html = get_sufficiency_badge_html(metadata)
-                            if badge_html:
-                                badge_placeholder.markdown(badge_html, unsafe_allow_html=True)
                         elif event == "sources":
                             sources = data.get("sources", []) if isinstance(data, dict) else data
                         elif event == "error":
@@ -183,11 +163,6 @@ def render_chat_window(api_client, settings):
 
                 if not full_response:
                     full_response = "⚠️ No response generated. Please check your model configuration."
-
-                if metadata:
-                    badge_html = get_sufficiency_badge_html(metadata)
-                    if badge_html:
-                        badge_placeholder.markdown(badge_html, unsafe_allow_html=True)
 
                 message_placeholder.markdown(
                     f'<div class="bot-msg-row"><div class="bot-msg-body">{full_response}</div></div>',
