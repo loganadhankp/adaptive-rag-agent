@@ -2,9 +2,6 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 
-# flake8: noqa - prompts contain long lines by design
-
-
 class ContextSufficiencyAssessment(BaseModel):
     """Structured evaluation of evidence sufficiency and answerability."""
 
@@ -62,7 +59,6 @@ class ContextSufficiencyAssessment(BaseModel):
             "is missing, and what document or details to provide. Leave empty if status is SUFFICIENT."
         )
     )
-
 
 CONTEXT_SUFFICIENCY_SYSTEM_PROMPT = """You are a strict Context Sufficiency and Truthfulness Evaluator for an enterprise document Knowledge Base.
 
@@ -130,18 +126,15 @@ CONTEXT_SUFFICIENCY_PROMPT = ChatPromptTemplate.from_messages(
     ]
 )
 
-
 def format_context_assessment_output(
     assessment: ContextSufficiencyAssessment, final_answer: Optional[str] = None
 ) -> str:
     """Formats natural, user-friendly responses: direct answer when SUFFICIENT, issue/missing info when abstaining."""
     NL = "\n"
 
-    # If SUFFICIENT, return the direct final answer cleanly without robotic diagnostics
     if assessment.status == "SUFFICIENT":
         return (final_answer or "").strip()
 
-    # Format missing information cleanly
     missing_items = assessment.missing_information or []
     missing_clean = [
         m.strip()
@@ -173,7 +166,6 @@ def format_context_assessment_output(
             f"**What is needed from you:**{NL}{req}"
         )
     else:
-        # INSUFFICIENT or IRRELEVANT
         if not req:
             req = (
                 "The uploaded documents do not contain the necessary information to answer this question accurately."

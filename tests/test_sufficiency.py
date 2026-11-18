@@ -8,7 +8,6 @@ from backend.prompts.sufficiency import (
     format_context_assessment_output,
 )
 
-
 class TestSufficiency(unittest.TestCase):
     def test_output_format_consistency_sufficient(self):
         assessment = ContextSufficiencyAssessment(
@@ -157,7 +156,6 @@ class TestSufficiency(unittest.TestCase):
             "context_assessment": None,
         }
 
-        # Mock generator and hallucination/evaluator
         with patch("backend.workflow.nodes.generator.get_llm") as mock_gen_llm, \
              patch("backend.workflow.nodes.hallucination_checker.get_llm") as mock_hal_llm, \
              patch("backend.workflow.nodes.evaluator.get_llm") as mock_eval_llm, \
@@ -266,13 +264,11 @@ class TestSufficiency(unittest.TestCase):
                 graph = create_rag_graph()
                 result = graph.invoke(initial_state)
 
-                # CRITICAL VERIFICATION: generator must NEVER be called
                 mock_generate_node.assert_not_called()
                 self.assertEqual(result["answerability_status"], non_suff_status)
                 self.assertFalse(result["is_fully_answerable"])
                 self.assertNotIn("Final Answer:", result["generation"])
                 self.assertIn("What is needed from you:", result["generation"])
-
 
 if __name__ == "__main__":
     unittest.main()

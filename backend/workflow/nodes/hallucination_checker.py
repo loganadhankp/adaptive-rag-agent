@@ -11,7 +11,6 @@ from backend.prompts.hallucination import (
 
 logger = logging.getLogger(__name__)
 
-
 def check_hallucination(state: RAGState) -> dict:
     answer = state.get("generation", "")
     logger.info(f"[HallucinationChecker] Verifying answer against evidence ({len(state.get('documents', []))} docs)")
@@ -25,7 +24,6 @@ def check_hallucination(state: RAGState) -> dict:
         context_docs = state.get("documents", [])
         context_str = "\n\n".join([d["content"] for d in context_docs])
 
-        # Select hallucination prompt based on question intent
         intent = state.get("question_intent", "fact_extraction")
         is_analytical = intent in ANALYTICAL_INTENTS
         hallucination_prompt = ANALYTICAL_HALLUCINATION_PROMPT if is_analytical else FACTUAL_HALLUCINATION_PROMPT

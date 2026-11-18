@@ -7,7 +7,6 @@ from backend.workflow.state import RAGState
 
 logger = logging.getLogger(__name__)
 
-
 def web_search(state: RAGState) -> dict:
     """Execute a web search via Tavily using the original user question."""
     query = state.get("original_question") or state.get("question", "")
@@ -54,7 +53,6 @@ def web_search(state: RAGState) -> dict:
                         }
                     )
 
-        # Discard irrelevant local documents, keep only verified relevant local docs + web results
         docs = [
             d for d in state.get("documents", [])
             if d.get("metadata", {}).get("source_type") == "knowledge_base" and d.get("metadata", {}).get("is_relevant") is True

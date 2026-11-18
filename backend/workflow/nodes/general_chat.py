@@ -15,7 +15,6 @@ GENERAL_CHAT_SYSTEM_PROMPT = (
     "Do NOT mention knowledge bases, document sufficiency, or retrieval, as this is a general conversational interaction."
 )
 
-
 def generate_general_chat(state: RAGState) -> dict:
     """Answers general conversational or knowledge queries directly using the LLM without retrieval."""
     question = state.get("question", "")
@@ -30,7 +29,6 @@ def generate_general_chat(state: RAGState) -> dict:
 
         messages = [SystemMessage(content=GENERAL_CHAT_SYSTEM_PROMPT)]
 
-        # Append past conversation history (limit to last 10 messages for context)
         raw_history = state.get("conversation_history", [])[-10:]
         for msg in raw_history:
             role = msg.get("role", "user")
@@ -42,7 +40,6 @@ def generate_general_chat(state: RAGState) -> dict:
             elif role == "assistant":
                 messages.append(AIMessage(content=content))
 
-        # Add current question
         messages.append(HumanMessage(content=question))
 
         response = llm.invoke(messages)

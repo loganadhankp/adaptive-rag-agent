@@ -14,7 +14,6 @@ from backend.models import ChatRequest
 
 client = TestClient(app)
 
-
 class DummyVectorStore:
     def __init__(self):
         self.docs = []
@@ -24,7 +23,6 @@ class DummyVectorStore:
 
     def delete(self, where=None):
         pass
-
 
 @pytest.fixture
 def temp_kb_service():
@@ -47,13 +45,11 @@ def temp_kb_service():
         service = KnowledgeBaseService(settings, repo, vector_store=dummy_vs)
         yield service, settings, repo, tmpdir
 
-
 @pytest.mark.asyncio
 async def test_path_traversal_prevention_in_upload(temp_kb_service):
     """Path traversal attempt in filename must be sanitized to basename inside DOCUMENTS_DIR."""
     service, settings, repo, tmpdir = temp_kb_service
 
-    # Malicious filename attempting path traversal
     malicious_filename = "../../evil_outside.txt"
     content = b"Harmless test content"
     upload_file = UploadFile(
@@ -63,14 +59,11 @@ async def test_path_traversal_prevention_in_upload(temp_kb_service):
 
     res = await service.upload_document(upload_file)
     assert res.id is not None
-    # Verify no file was written outside settings.DOCUMENTS_DIR
     parent_of_docs = os.path.dirname(settings.DOCUMENTS_DIR)
     assert not os.path.exists(os.path.join(parent_of_docs, "evil_outside.txt"))
-    # The actual saved file should reside strictly inside settings.DOCUMENTS_DIR
     saved_files = os.listdir(settings.DOCUMENTS_DIR)
     assert len(saved_files) == 1
     assert "evil_outside.txt" in saved_files[0]
-
 
 @pytest.mark.asyncio
 async def test_markdown_file_support(temp_kb_service):
@@ -88,7 +81,6 @@ async def test_markdown_file_support(temp_kb_service):
     assert res.file_type == "md"
     assert res.chunk_count > 0
 
-
 @pytest.mark.asyncio
 async def test_empty_file_rejected(temp_kb_service):
     """0-byte files should be rejected with HTTP 400."""
@@ -104,12 +96,10 @@ async def test_empty_file_rejected(temp_kb_service):
     assert exc_info.value.status_code == 400
     assert "empty" in str(exc_info.value.detail).lower()
 
-
 @pytest.mark.asyncio
 async def test_oversized_file_rejected(temp_kb_service):
     """Files exceeding MAX_UPLOAD_SIZE_BYTES should be rejected with HTTP 413."""
     service, settings, repo, tmpdir = temp_kb_service
-    # Set a 10KB limit on settings for fast testing
     setattr(settings, "MAX_UPLOAD_SIZE_BYTES", 1024)
 
     huge_content = b"A" * 2048
@@ -122,7 +112,6 @@ async def test_oversized_file_rejected(temp_kb_service):
         await service.upload_document(upload_file)
     assert exc_info.value.status_code == 413
     assert "exceeds" in str(exc_info.value.detail).lower()
-
 
 @pytest.mark.asyncio
 async def test_unsupported_file_extension(temp_kb_service):
@@ -137,7 +126,6 @@ async def test_unsupported_file_extension(temp_kb_service):
     with pytest.raises(HTTPException) as exc_info:
         await service.upload_document(upload_file)
     assert exc_info.value.status_code == 400
-
 
 @pytest.mark.asyncio
 async def test_corrupted_analytics_event_data_resilience(temp_kb_service):
@@ -155,7 +143,6 @@ async def test_corrupted_analytics_event_data_resilience(temp_kb_service):
     summary = repo.get_analytics_summary()
     assert summary is not None
     assert summary["avg_answer_quality"] == 0.0
-
 
 def test_cors_headers_present():
     """OPTIONS request should return proper CORS headers."""

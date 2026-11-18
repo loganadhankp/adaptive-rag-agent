@@ -15,7 +15,6 @@ from fastapi import UploadFile
 
 client = TestClient(app)
 
-
 def test_measure_ingestion_latency():
     """Benchmark document ingestion and chunking speed for realistic document size."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -40,12 +39,11 @@ def test_measure_ingestion_latency():
 
         service = KnowledgeBaseService(settings, repo, vector_store=FastVectorStore())
 
-        # 50KB realistic text document
         sample_paragraphs = (
             "Enterprise Policy Section.\n"
             "Employees are eligible for 25 annual leave days and flexible remote hours.\n"
             "All expense submissions must be finalized within thirty calendar days.\n"
-        ) * 400  # ~50 KB
+        ) * 400
 
         upload_file = UploadFile(
             file=io.BytesIO(sample_paragraphs.encode("utf-8")),
@@ -58,9 +56,8 @@ def test_measure_ingestion_latency():
         duration = time.perf_counter() - start_t
 
         print(f"\n[Benchmark] Ingested {doc.chunk_count} chunks in {duration*1000:.2f} ms")
-        assert duration < 2.0  # Must ingest within 2 seconds
+        assert duration < 2.0
         assert doc.chunk_count > 0
-
 
 def test_measure_concurrent_endpoint_latency():
     """Benchmark health and metrics endpoint throughput across concurrent threads."""
@@ -71,7 +68,7 @@ def test_measure_concurrent_endpoint_latency():
         res = client.get("/health")
         t1 = time.perf_counter()
         assert res.status_code == 200
-        return (t1 - t0) * 1000  # ms
+        return (t1 - t0) * 1000
 
     concurrency_levels = [1, 5, 10]
     results = {}
@@ -88,9 +85,7 @@ def test_measure_concurrent_endpoint_latency():
         results[c] = {"p50": p50, "p95": p95, "avg": statistics.mean(c_latencies)}
         print(f"\n[Benchmark] Concurrency={c}: p50={p50:.2f}ms, p95={p95:.2f}ms, avg={results[c]['avg']:.2f}ms")
 
-    # Verify average latency stays well under 150ms for 10 concurrent clients
     assert results[10]["avg"] < 150.0
-
 
 def test_measure_fast_path_empty_prompt_ttft():
     """Measure Time to First Token (TTFT) for empty/whitespace input early return."""
@@ -100,4 +95,4 @@ def test_measure_fast_path_empty_prompt_ttft():
     duration_ms = (t1 - t0) * 1000
     print(f"\n[Benchmark] Early guard TTFT: {duration_ms:.2f} ms")
     assert resp.status_code == 200
-    assert duration_ms < 100.0  # Guard response under 100ms
+    assert duration_ms < 100.0

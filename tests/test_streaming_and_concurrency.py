@@ -7,7 +7,6 @@ from backend.main import app
 
 client = TestClient(app)
 
-
 def test_payload_length_validation():
     """Prompts exceeding max_length (50000 chars) must be rejected with HTTP 422."""
     huge_message = "A" * 50001
@@ -16,7 +15,6 @@ def test_payload_length_validation():
         json={"message": huge_message},
     )
     assert resp.status_code == 422
-
 
 def test_temperature_range_validation():
     """Negative temperature or temperature > 2.0 must be rejected with HTTP 422."""
@@ -31,7 +29,6 @@ def test_temperature_range_validation():
         json={"message": "hello", "temperature": 2.5},
     )
     assert resp2.status_code == 422
-
 
 @patch("backend.services.chat_service.run_rag_pipeline")
 def test_sse_event_structure_and_no_duplicate_done(mock_pipeline):
@@ -80,17 +77,14 @@ def test_sse_event_structure_and_no_duplicate_done(mock_pipeline):
             elif ev_name == "done":
                 done_count += 1
 
-    # Verify event sequencing
     assert "conversation_id" in events
     assert "token" in events
     assert "metadata" in events
     assert "done" in events
-    assert done_count == 1  # Exactly one done event
+    assert done_count == 1
 
-    # Reconstructed generation matches expected
     reconstructed = "".join(tokens)
     assert reconstructed == "FastAPI is a modern web framework."
-
 
 def test_concurrent_health_and_metrics_calls():
     """Concurrent calls to health and metrics should return 200 OK consistently."""

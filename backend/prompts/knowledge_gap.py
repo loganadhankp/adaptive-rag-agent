@@ -2,9 +2,6 @@ from typing import List, Literal
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 
-# flake8: noqa - prompts contain long lines by design
-
-
 class KnowledgeGapAnalysis(BaseModel):
     """Structured evaluation of evidence sufficiency and knowledge gaps."""
 
@@ -73,7 +70,6 @@ class KnowledgeGapAnalysis(BaseModel):
             "Clearly state what is missing, what is required, what document to upload, and that the system will not guess."
         ),
     )
-
 
 KNOWLEDGE_GAP_SYSTEM_PROMPT = """You are a strict Evidence Sufficiency and Knowledge Gap Evaluator for an enterprise document Q&A assistant.
 

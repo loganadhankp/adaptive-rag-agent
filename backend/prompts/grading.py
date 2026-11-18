@@ -1,9 +1,7 @@
 from typing import Literal
 
-# flake8: noqa - prompt templates intentionally contain long lines
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-
 
 class RelevanceGrade(BaseModel):
     """Relevance grade for a retrieved document."""
@@ -12,11 +10,6 @@ class RelevanceGrade(BaseModel):
         description="Relevance of the document to the question"
     )
     reasoning: str = Field(description="Brief explanation for the grade")
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Query Intent Routing (GENERAL_CHAT vs KNOWLEDGE_BASE_QUERY)
-# ──────────────────────────────────────────────────────────────────────────────
 
 class QueryIntentRoute(BaseModel):
     """Route user query to either GENERAL_CHAT or KNOWLEDGE_BASE_QUERY."""
@@ -29,7 +22,6 @@ class QueryIntentRoute(BaseModel):
         )
     )
     reasoning: str = Field(description="Brief explanation for the routing decision")
-
 
 ROUTER_SYSTEM_PROMPT = """You are an intent router for an AI assistant.
 Your task is to classify whether the user's message is a GENERAL_CHAT or a KNOWLEDGE_BASE_QUERY.
@@ -51,11 +43,6 @@ QUERY_ROUTER_PROMPT = ChatPromptTemplate.from_messages(
     [("system", ROUTER_SYSTEM_PROMPT), ("human", ROUTER_HUMAN_PROMPT)]
 )
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Question Intent Classification
-# ──────────────────────────────────────────────────────────────────────────────
-
 INTENT_LABELS = [
     "fact_extraction",
     "summarization",
@@ -63,7 +50,6 @@ INTENT_LABELS = [
     "recommendation",
     "comparison",
 ]
-
 
 class QuestionIntent(BaseModel):
     """Classified intent of the user's question."""
@@ -76,7 +62,6 @@ class QuestionIntent(BaseModel):
         "comparison",
     ] = Field(description="The primary intent of the user's question")
     reasoning: str = Field(description="Brief explanation for the classification")
-
 
 INTENT_SYSTEM_PROMPT = """You are a question intent classifier for a document-based Q&A system.
 
@@ -105,13 +90,7 @@ INTENT_PROMPT = ChatPromptTemplate.from_messages(
     [("system", INTENT_SYSTEM_PROMPT), ("human", INTENT_HUMAN_PROMPT)]
 )
 
-# Intents that require LLM reasoning over (not just extraction from) documents
 ANALYTICAL_INTENTS = {"analysis", "recommendation", "comparison", "summarization"}
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Document Relevance Grading
-# ──────────────────────────────────────────────────────────────────────────────
 
 GRADING_SYSTEM_PROMPT = """You are an expert document relevance grader.
 Your task is to assess whether a given document contains information that is relevant to answering the user's question.

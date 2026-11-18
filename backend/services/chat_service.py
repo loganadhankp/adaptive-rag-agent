@@ -11,7 +11,6 @@ from backend.workflow.graph import run_rag_pipeline
 
 logger = logging.getLogger(__name__)
 
-
 class ChatService:
     def __init__(self, settings, repository):
         self.settings = settings
@@ -37,13 +36,11 @@ class ChatService:
 
         logger.info(f"[ChatService] Incoming message in conv {conversation_id}: '{request.message}'")
 
-        # Yield conversation_id event immediately
         yield ServerSentEvent(
             event="conversation_id",
             data=json.dumps({"conversation_id": conversation_id}),
         )
 
-        # Handle empty/whitespace prompts gracefully without making LLM calls
         if not msg_text:
             empty_reply = "Please enter a message or question."
             yield ServerSentEvent(
@@ -57,13 +54,11 @@ class ChatService:
         self.repository.add_message(conversation_id=conversation_id, role="user", content=request.message)
 
         try:
-            # Emit immediate initial status indicator
             yield ServerSentEvent(
                 event="status",
                 data=json.dumps({"step": {"step": "classify_intent", "label": "Thinking..."}}),
             )
 
-            # Run RAG pipeline
             provider = request.provider or getattr(self.settings, "LLM_PROVIDER", "gemini")
             model = request.model or getattr(self.settings, "LLM_MODEL", "gemini-3.5-flash-lite")
 
@@ -79,7 +74,6 @@ class ChatService:
                 conversation_id=conversation_id,
             )
 
-            # Yield status events for workflow steps
             for step in result.get("workflow_steps", []):
                 yield ServerSentEvent(event="status", data=json.dumps({"step": step}))
 
@@ -92,7 +86,6 @@ class ChatService:
                     data=json.dumps({"step": {"step": "evidence_insufficient", "label": "Evidence Insufficient"}}),
                 )
 
-            # Determine generation text
             generation = result.get("generation", "")
             if not generation:
                 if result.get("error"):
@@ -102,7 +95,6 @@ class ChatService:
                         "I could not find enough relevant information in the Knowledge Base to answer your query."
                     )
 
-            # Yield generation text in responsive tokens with smooth ChatGPT-style streaming
             token_chunks = re.findall(r"\S+\s*|\s+", generation)
             for token_chunk in token_chunks:
                 yield ServerSentEvent(
@@ -111,14 +103,12 @@ class ChatService:
                 )
                 await asyncio.sleep(0.012)
 
-            # Yield sources
             sources = result.get("sources", [])
             yield ServerSentEvent(
                 event="sources",
                 data=json.dumps({"sources": sources}),
             )
 
-            # Yield metadata
             final_status = "GENERAL_CHAT" if query_route == "GENERAL_CHAT" else (status_val or "SUFFICIENT")
             metadata = {
                 "query_route": query_route,
@@ -149,7 +139,6 @@ class ChatService:
 
             yield ServerSentEvent(event="done", data="")
 
-            # Save assistant message
             self.repository.add_message(
                 conversation_id=conversation_id,
                 role="assistant",
@@ -158,7 +147,6 @@ class ChatService:
                 workflow_metadata=metadata,
             )
 
-            # Log analytics
             self.repository.log_analytics_event(
                 conversation_id=conversation_id,
                 event_type=("retrieval_success" if result.get("documents") else "retrieval_failure"),
@@ -181,7 +169,6 @@ class ChatService:
         except Exception as e:
             logger.error(f"[ChatService] Uncaught error during chat processing: {e}", exc_info=True)
             raw_err = str(e)
-            # Redact API keys from client-facing output
             sanitized_err = re.sub(r"AIza[0-9A-Za-z-_]{35}", "[REDACTED_API_KEY]", raw_err)
             sanitized_err = re.sub(r"sk-[a-zA-Z0-9]{20,}", "[REDACTED_API_KEY]", sanitized_err)
             error_msg = f"⚠️ System error: {sanitized_err}"

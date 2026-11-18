@@ -6,7 +6,6 @@ from backend.workflow.state import RAGState
 
 logger = logging.getLogger(__name__)
 
-
 def retrieve_documents(state: RAGState) -> dict:
     """Retrieve top-K matching document chunks from ChromaDB."""
     query = state.get("question", "")
@@ -20,7 +19,6 @@ def retrieve_documents(state: RAGState) -> dict:
         settings = get_settings()
         vector_store = get_vector_store()
 
-        # 1. If conversation_id is provided, try conversation-scoped search first
         results = []
         if conv_id:
             try:
@@ -33,7 +31,6 @@ def retrieve_documents(state: RAGState) -> dict:
                 logger.info(f"[Retriever] Scoped search exception ({fe}); falling back to general search")
                 results = []
 
-        # 2. If no conversation-scoped results found (or no conv_id), search across entire collection
         if not results:
             try:
                 results = vector_store.similarity_search_with_relevance_scores(
@@ -43,7 +40,6 @@ def retrieve_documents(state: RAGState) -> dict:
                 logger.info(f"[Retriever] General relevance score search failed ({e}); falling back to standard similarity search")
                 results = []
 
-        # 3. Fallback to standard similarity_search if relevance score search returns empty
         if not results:
             try:
                 docs = vector_store.similarity_search(query, k=settings.MAX_RETRIEVAL_RESULTS)

@@ -5,7 +5,6 @@ from frontend.api_client import RAGApiClient
 from frontend.components.chat_window import render_chat_window
 from frontend.styles import CUSTOM_CSS
 
-# Page config: minimal, no sidebar
 st.set_page_config(
     page_title="RAG Agent",
     page_icon="💬",
@@ -13,11 +12,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Inject custom minimal CSS (completely hides sidebar, headers, footers, etc.)
 st.markdown(f"<style>{CUSTOM_CSS}</style>", unsafe_allow_html=True)
 
-
-# Initialize session state: browser refresh = fresh chat session
 def init_session_state():
     if "session_initialized" not in st.session_state:
         st.session_state.session_initialized = True
@@ -31,13 +27,10 @@ def init_session_state():
             "temperature": 0.0,
         }
 
-
 init_session_state()
 
-# Initialize API client
 api_client = RAGApiClient()
 if "api_client" not in st.session_state:
     st.session_state["api_client"] = api_client
 
-# Render only the minimal chat window
 render_chat_window(api_client, st.session_state.settings)

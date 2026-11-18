@@ -54,10 +54,8 @@ def main():
     print("Starting Adaptive RAG Agent System")
     print("=" * 60)
 
-    # Load environment variables
     load_dotenv()
 
-    # Create directories
     create_directories()
 
     py_exe = get_python_executable()
@@ -80,7 +78,6 @@ def main():
         print("Starting FastAPI Backend...")
         env = os.environ.copy()
 
-        # Assuming backend is started via uvicorn from an app module or similar
         backend_cmd = [
             py_exe,
             "-m",
@@ -94,7 +91,6 @@ def main():
         ]
         backend_process = subprocess.Popen(backend_cmd, env=env)
 
-        # Wait for backend
         wait_for_backend("http://localhost:8000/health", timeout=15)
 
         print("Starting Streamlit Frontend...")

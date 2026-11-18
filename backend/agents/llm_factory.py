@@ -8,7 +8,6 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from backend.config import get_settings
 
-
 def get_llm(provider: str = None, model: str = None, temperature: float = 0.7):
     """Factory function to instantiate the configured production LLM."""
     settings = get_settings()
@@ -28,7 +27,6 @@ def get_llm(provider: str = None, model: str = None, temperature: float = 0.7):
                 "GOOGLE_API_KEY (or GEMINI_API_KEY) is not set. Please add your GOOGLE_API_KEY to the .env file or environment variables."
             )
         model_name = model or getattr(settings, "LLM_MODEL", "gemini-3.5-flash-lite")
-        # Normalize deprecated or 404 Gemini models to active gemini-3.5-flash-lite
         if model_name in [
             "gemini-2.5-flash",
             "gemini-2.5-flash-lite",
@@ -74,7 +72,6 @@ def get_llm(provider: str = None, model: str = None, temperature: float = 0.7):
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")
 
-
 def get_embeddings():
     """Factory function to instantiate production text embeddings."""
     settings = get_settings()
@@ -107,7 +104,6 @@ def get_embeddings():
         raise ValueError(
             "Neither GOOGLE_API_KEY nor OPENAI_API_KEY is configured for document embeddings. Please set GOOGLE_API_KEY in your .env file."
         )
-
 
 def get_vector_store():
     """Returns the Chroma vector store instance."""

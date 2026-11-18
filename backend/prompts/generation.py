@@ -1,11 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-# flake8: noqa - prompts contain long lines by design
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 1: Factual Extraction (for fact_extraction intent)
-# ──────────────────────────────────────────────────────────────────────────────
-
 FACTUAL_SYSTEM_PROMPT = """You are an expert AI assistant dedicated to providing thorough, insightful, and highly informative answers based on the user's Knowledge Base.
 Your task is to answer the user's question using the provided context documents in rich detail.
 
@@ -17,10 +11,6 @@ Guidelines:
 - Include inline citations referencing the source documents by name or identifier when you make a claim.
 - If the provided context does not contain sufficient information to answer the question, state honestly what is missing.
 - If conversation history is provided, use it to contextualize the current question and maintain a coherent flow."""
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 2: Analytical Reasoning (for analysis, recommendation, comparison, summarization intents)
-# ──────────────────────────────────────────────────────────────────────────────
 
 ANALYTICAL_SYSTEM_PROMPT = """You are an expert AI analyst and advisor.
 Your task is to provide thoughtful analysis, recommendations, critiques, summaries, or comparisons based on the provided context documents.
@@ -46,7 +36,6 @@ Context Documents:
 
 Question: {question}"""
 
-# Default prompt (backward compatible) — uses factual mode
 GENERATION_SYSTEM_PROMPT = FACTUAL_SYSTEM_PROMPT
 
 GENERATION_PROMPT = ChatPromptTemplate.from_messages(

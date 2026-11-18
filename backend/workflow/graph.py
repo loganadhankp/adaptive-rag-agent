@@ -19,11 +19,9 @@ from backend.workflow.state import RAGState
 
 logger = logging.getLogger(__name__)
 
-
 def create_rag_graph(provider="openai", model=None, temperature=0.7):
     workflow = StateGraph(RAGState)
 
-    # Primary workflow nodes
     workflow.add_node("classify_intent", classify_intent)
     workflow.add_node("general_chat", generate_general_chat)
     workflow.add_node("retrieve", retrieve_documents)
@@ -33,13 +31,11 @@ def create_rag_graph(provider="openai", model=None, temperature=0.7):
     workflow.add_node("check_hallucination", check_hallucination)
     workflow.add_node("evaluate_answer", evaluate_answer)
 
-    # Auxiliary nodes retained for backward compatibility
     workflow.add_node("grade_documents", grade_documents)
     workflow.add_node("knowledge_gap_analysis", analyze_knowledge_gap)
     workflow.add_node("rewrite_query", rewrite_query)
     workflow.add_node("web_search", web_search)
 
-    # Intent routing: GENERAL_CHAT -> general_chat -> END; KNOWLEDGE_BASE_QUERY -> retrieve -> check_sufficiency
     def route_after_intent(state: RAGState) -> str:
         route = state.get("query_route", "")
         if route == "GENERAL_CHAT":
@@ -60,7 +56,6 @@ def create_rag_graph(provider="openai", model=None, temperature=0.7):
     workflow.add_edge("general_chat", END)
     workflow.add_edge("retrieve", "check_sufficiency")
 
-    # Routing based strictly on answerability_status (NOT numeric scores)
     def route_after_sufficiency(state: RAGState):
         status = str(state.get("answerability_status", "")).strip().upper()
         logger.info(f"[WorkflowRouter] Sufficiency Routing: answerability_status='{status}'")
@@ -84,11 +79,9 @@ def create_rag_graph(provider="openai", model=None, temperature=0.7):
         },
     )
 
-    # After generation proceed to hallucination verification
     workflow.add_edge("generate", "check_hallucination")
     workflow.add_edge("regenerate", "check_hallucination")
 
-    # After hallucination check
     def route_after_hallucination(state):
         if state.get("error"):
             logger.warning(f"[WorkflowRouter] Error encountered ({state.get('error')}) -> routing to 'evaluate_answer'")
@@ -121,7 +114,6 @@ def create_rag_graph(provider="openai", model=None, temperature=0.7):
         {"evaluate_answer": "evaluate_answer", "regenerate": "regenerate"},
     )
 
-    # After evaluation
     def route_after_evaluation(state):
         if state.get("error"):
             return END
@@ -149,7 +141,6 @@ def create_rag_graph(provider="openai", model=None, temperature=0.7):
     )
 
     return workflow.compile()
-
 
 async def run_rag_pipeline(
     question,

@@ -13,13 +13,11 @@ from backend.services.analytics_service import AnalyticsService
 from backend.services.chat_service import ChatService
 from backend.services.kb_service import KnowledgeBaseService
 
-# Ensure necessary directories exist
 os.makedirs(settings.DOCUMENTS_DIR, exist_ok=True)
 os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
 
 app = FastAPI(title="Adaptive RAG Agent")
 
-# Enable CORS for local and web frontends
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,8 +31,6 @@ try:
 except Exception:
     vector_store = None
 
-# Database init
-# This keeps compatibility with code expecting a Repository class name in older project wiring.
 db_manager = DatabaseManager(settings.SQLITE_DB_PATH)
 db_manager.init_db()
 
@@ -51,11 +47,9 @@ app.include_router(chat_router, prefix="/api/chat")
 app.include_router(kb_router, prefix="/api/kb")
 app.include_router(analytics_router, prefix="/api/analytics")
 
-
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
 
 @app.get("/metrics")
 async def get_metrics():

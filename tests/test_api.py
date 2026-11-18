@@ -3,14 +3,12 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-# Mock application import
 try:
     from backend.main import app
 
     client = TestClient(app)
 except ImportError:
     client = None
-
 
 class TestAPI(unittest.TestCase):
     def setUp(self):
@@ -74,7 +72,6 @@ class TestAPI(unittest.TestCase):
         data = response.json()
         self.assertEqual(data["total_conversations"], 10)
         self.assertEqual(data["retrieval_success_rate"], 90.0)
-
 
 if __name__ == "__main__":
     unittest.main()

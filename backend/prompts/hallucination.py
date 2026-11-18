@@ -1,9 +1,7 @@
 from typing import Literal
 
-# flake8: noqa - prompt templates intentionally contain long lines
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-
 
 class HallucinationResult(BaseModel):
     """Result of hallucination check."""
@@ -17,11 +15,6 @@ class HallucinationResult(BaseModel):
         description="List of specific claims not supported by sources",
     )
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 1: Strict Factual Hallucination Check
-# ──────────────────────────────────────────────────────────────────────────────
-
 FACTUAL_HALLUCINATION_SYSTEM_PROMPT = """You are a strict hallucination detector.
 Your task is to compare a generated answer against a set of source documents to determine if the answer is completely supported by the evidence.
 
@@ -31,10 +24,6 @@ Guidelines:
 - If ANY claim in the answer is not supported by the source documents, mark the verdict as 'unsupported' and list the unsupported claims.
 - If ALL claims are supported, mark the verdict as 'supported'.
 - Do not evaluate the quality of the writing, only its factual grounding in the provided documents."""
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 2: Analytical Hallucination Check (for analysis/recommendation/comparison/summarization)
-# ──────────────────────────────────────────────────────────────────────────────
 
 ANALYTICAL_HALLUCINATION_SYSTEM_PROMPT = """You are a hallucination detector for analytical and advisory responses.
 The generated answer contains a mix of: (a) factual references to source document content, and (b) the LLM's own analytical reasoning, recommendations, or assessments applied to that content.
@@ -51,7 +40,6 @@ HALLUCINATION_HUMAN_PROMPT = """Source Documents:
 
 Generated Answer: {answer}"""
 
-# Default (backward compatible)
 HALLUCINATION_SYSTEM_PROMPT = FACTUAL_HALLUCINATION_SYSTEM_PROMPT
 
 HALLUCINATION_PROMPT = ChatPromptTemplate.from_messages(

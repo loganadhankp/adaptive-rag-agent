@@ -11,7 +11,6 @@ from backend.prompts.sufficiency import (
 
 logger = logging.getLogger(__name__)
 
-
 def generate_answer(state: RAGState) -> dict:
     context_docs = state.get("documents", [])
     used_web_search = state.get("used_web_search", False)
@@ -51,7 +50,6 @@ def generate_answer(state: RAGState) -> dict:
             ]
         )
 
-        # Select prompt based on question intent
         intent = state.get("question_intent", "fact_extraction")
         is_analytical = intent in ANALYTICAL_INTENTS
         prompt_template = ANALYTICAL_PROMPT if is_analytical else FACTUAL_PROMPT
@@ -92,7 +90,6 @@ def generate_answer(state: RAGState) -> dict:
             )
 
         generation_retry_count = state.get("generation_retry_count", 0)
-        # Increment if this is a retry from hallucination check, evaluation, or explicit regenerate
         if state.get("current_step") in [
             "evaluate_answer",
             "check_hallucination",
@@ -100,7 +97,6 @@ def generate_answer(state: RAGState) -> dict:
         ]:
             generation_retry_count += 1
 
-        # Format output strictly with standardized Context Assessment header
         assessment_dict = state.get("context_assessment")
         if assessment_dict:
             try:

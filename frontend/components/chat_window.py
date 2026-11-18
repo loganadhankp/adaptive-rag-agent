@@ -3,11 +3,9 @@ import uuid
 import streamlit as st
 from frontend.testing_utils import add_testid
 
-
 def get_sufficiency_badge_html(metadata: dict) -> str:
     """Returns empty string - suppresses diagnostic badge headers for clean ChatGPT-style interface."""
     return ""
-
 
 def render_sufficiency_badge(metadata: dict):
     """Renders colored evidence sufficiency badge into the current container."""
@@ -15,12 +13,10 @@ def render_sufficiency_badge(metadata: dict):
     if badge_html:
         st.markdown(badge_html, unsafe_allow_html=True)
 
-
 def render_chat_window(api_client, settings):
     """Minimal ChatGPT/Gemini style chat interface."""
     add_testid("chat-window")
 
-    # 1. Ensure active conversation ID (ephemeral session reset on fresh load)
     active_id = st.session_state.get("active_conversation_id")
     if not active_id:
         active_id = str(uuid.uuid4())
@@ -31,7 +27,6 @@ def render_chat_window(api_client, settings):
 
     messages = st.session_state.messages.get(active_id, [])
 
-    # 2. Chat message area
     chat_container = st.container()
 
     with chat_container:
@@ -58,7 +53,6 @@ def render_chat_window(api_client, settings):
                     unsafe_allow_html=True,
                 )
 
-    # 3. Fixed Upload Document button at bottom-left
     st.markdown('<div class="fixed-bottom-left-upload">', unsafe_allow_html=True)
     with st.popover("📎 Upload Document", help="Upload document to Knowledge Base"):
         add_testid("kb-upload-button", visible=False)
@@ -79,7 +73,6 @@ def render_chat_window(api_client, settings):
                 st.toast(f"✓ Uploaded {len(uploaded_files)} document(s)")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # 4. Message input box at bottom-center with Send button
     add_testid("chat-input")
     user_input = st.chat_input(
         "Message...",
@@ -88,7 +81,6 @@ def render_chat_window(api_client, settings):
     )
 
     if user_input:
-        # Extract files if attached via native chat input button
         attached_files = getattr(user_input, "files", []) or []
         for af in attached_files:
             try:
@@ -97,12 +89,10 @@ def render_chat_window(api_client, settings):
             except Exception:
                 pass
 
-        # Extract text prompt
         prompt_text = getattr(user_input, "text", None) or str(user_input)
         prompt_text = prompt_text.strip() if isinstance(prompt_text, str) else ""
 
         if prompt_text:
-            # 5. Append user message to state and display immediately
             messages.append({"role": "user", "content": prompt_text})
             st.session_state.messages[active_id] = messages
 
@@ -194,20 +184,17 @@ def render_chat_window(api_client, settings):
                 if not full_response:
                     full_response = "⚠️ No response generated. Please check your model configuration."
 
-                # Render badge if metadata arrived and hasn't been rendered yet
                 if metadata:
                     badge_html = get_sufficiency_badge_html(metadata)
                     if badge_html:
                         badge_placeholder.markdown(badge_html, unsafe_allow_html=True)
 
-                # Final update into message placeholder without emptying (prevents DOM flash/jump)
                 message_placeholder.markdown(
                     f'<div class="bot-msg-row"><div class="bot-msg-body">{full_response}</div></div>',
                     unsafe_allow_html=True,
                 )
                 add_testid("assistant-message")
 
-            # Save assistant message in session state (NO st.rerun() to prevent any blinking or DOM reset)
             messages.append(
                 {
                     "role": "assistant",

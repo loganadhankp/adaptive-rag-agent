@@ -2,9 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from backend.workflow.nodes.web_search import web_search
 
-
 def test_web_search_invokes_tavily(monkeypatch):
-    # Ensure env key is set so the node attempts to run
     monkeypatch.setenv("TAVILY_API_KEY", "testkey")
 
     with patch("backend.workflow.nodes.web_search.TavilySearchResults") as MockTavily:

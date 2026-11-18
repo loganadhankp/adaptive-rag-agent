@@ -3,7 +3,6 @@ import threading
 from contextlib import contextmanager
 from pathlib import Path
 
-
 class DatabaseManager:
     def __init__(self, db_path: str):
         self.db_path = Path(db_path)
@@ -52,7 +51,6 @@ class DatabaseManager:
                     conversation_id TEXT
                 )
             """)
-            # Check if conversation_id column exists for existing databases
             cursor.execute("PRAGMA table_info(documents)")
             columns = [col[1] for col in cursor.fetchall()]
             if "conversation_id" not in columns:

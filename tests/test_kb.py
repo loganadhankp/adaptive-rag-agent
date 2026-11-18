@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-
-# Mocks for database and documents
 class TestKB(unittest.TestCase):
 
     @patch("backend.database.DatabaseManager")
@@ -36,7 +34,6 @@ class TestKB(unittest.TestCase):
         chunks = splitter.split_text("This is a long text to be split.")
         self.assertEqual(len(chunks), 2)
         self.assertEqual(chunks[0], "chunk 1")
-
 
 if __name__ == "__main__":
     unittest.main()

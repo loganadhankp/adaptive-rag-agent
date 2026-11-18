@@ -1,14 +1,11 @@
-# flake8: noqa - prompt templates intentionally contain long lines
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-
 
 class RewrittenQuery(BaseModel):
     """Rewritten query for improved retrieval."""
 
     rewritten_query: str = Field(description="The improved, more specific query")
     reasoning: str = Field(description="Why the query was rewritten this way")
-
 
 REWRITING_SYSTEM_PROMPT = """You are an expert search query optimizer.
 Your task is to rewrite a given user question to optimize search retrieval.

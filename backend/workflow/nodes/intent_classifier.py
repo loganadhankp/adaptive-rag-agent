@@ -13,12 +13,10 @@ from backend.prompts.grading import (
 
 logger = logging.getLogger(__name__)
 
-# Common conversational greetings & pleasantries pattern
 GREETING_PATTERN = re.compile(
     r"^\s*(hi|hello|hey|greetings|good\s+(morning|afternoon|evening|day)|howdy|sup|yo|how\s+are\s+you|who\s+are\s+you|what\s+can\s+you\s+do|thanks|thank\s+you|bye|goodbye)\b[!?.\s]*$",
     re.IGNORECASE,
 )
-
 
 def classify_intent(state: RAGState) -> dict:
     """
@@ -32,7 +30,6 @@ def classify_intent(state: RAGState) -> dict:
     question = state.get("question", "").strip()
     logger.info(f"[IntentClassifier] Routing query: '{question}'")
 
-    # Fast-path for common greetings/pleasantries
     if GREETING_PATTERN.match(question):
         logger.info(f"[IntentClassifier] Fast-path greeting detected -> GENERAL_CHAT")
         return {
@@ -49,7 +46,6 @@ def classify_intent(state: RAGState) -> dict:
         }
 
     try:
-        # Route query: GENERAL_CHAT vs KNOWLEDGE_BASE_QUERY
         router_llm = get_llm(
             provider=state.get("provider"),
             model=state.get("model"),
@@ -76,7 +72,6 @@ def classify_intent(state: RAGState) -> dict:
                 "current_step": "classify_intent",
             }
 
-        # For KNOWLEDGE_BASE_QUERY: classify sub-intent
         intent = "fact_extraction"
         is_analytical = False
         try:

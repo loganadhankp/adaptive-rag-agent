@@ -5,7 +5,6 @@ from backend.main import app
 
 client = TestClient(app)
 
-
 @patch("backend.services.chat_service.run_rag_pipeline")
 def test_conversation_lifecycle_and_stream(mock_pipeline):
     mock_pipeline.return_value = {
@@ -17,13 +16,11 @@ def test_conversation_lifecycle_and_stream(mock_pipeline):
         "workflow_steps": [{"step": "retrieve_documents", "status": "completed", "detail": "Retrieved 1 doc"}],
     }
 
-    # Create a conversation
     resp = client.post("/api/chat/conversations")
     assert resp.status_code == 200
     conv = resp.json()
     assert "id" in conv or "conversation_id" in conv or isinstance(conv, dict)
 
-    # Post a chat message to the stream endpoint
     payload = {
         "conversation_id": None,
         "message": "What is the company leave policy?",
@@ -35,7 +32,6 @@ def test_conversation_lifecycle_and_stream(mock_pipeline):
     r = client.post("/api/chat/stream", json=payload)
     assert r.status_code == 200
     text = r.text
-    # Ensure the stream includes conversation_id, token, and done events
     assert "conversation_id" in text
     assert "token" in text or "data:" in text
     assert "done" in text

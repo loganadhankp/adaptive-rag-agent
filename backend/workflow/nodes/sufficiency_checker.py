@@ -10,7 +10,6 @@ from backend.prompts.sufficiency import (
 
 logger = logging.getLogger(__name__)
 
-
 def check_sufficiency(state: RAGState) -> dict:
     """Evaluates whether retrieved documents contain sufficient evidence before answer generation."""
     question = state.get("question", "")
@@ -22,7 +21,6 @@ def check_sufficiency(state: RAGState) -> dict:
         f"across {len(documents)} retrieved chunk(s)..."
     )
 
-    # Empty context check: immediate IRRELEVANT classification
     if not documents:
         logger.info("[SufficiencyChecker] No documents retrieved. Classifying as IRRELEVANT.")
         assessment = ContextSufficiencyAssessment(
@@ -104,12 +102,10 @@ def check_sufficiency(state: RAGState) -> dict:
             f"reason={assessment.knowledge_gap_reason}"
         )
 
-        # Normalize status to strict uppercase values
         status = assessment.status.upper()
         if status not in ["SUFFICIENT", "PARTIALLY_SUFFICIENT", "INSUFFICIENT", "IRRELEVANT"]:
             status = "INSUFFICIENT"
 
-        # If SUFFICIENT: mark fully answerable and proceed to generation
         if status == "SUFFICIENT":
             return {
                 "answerability_status": "SUFFICIENT",
@@ -135,7 +131,6 @@ def check_sufficiency(state: RAGState) -> dict:
                 "current_step": "check_sufficiency",
             }
 
-        # Otherwise (PARTIALLY_SUFFICIENT, INSUFFICIENT, IRRELEVANT): Halt and format abstention response
         formatted_output = format_context_assessment_output(assessment)
 
         return {
@@ -165,7 +160,6 @@ def check_sufficiency(state: RAGState) -> dict:
 
     except Exception as e:
         logger.error(f"[SufficiencyChecker] Error during sufficiency evaluation: {e}", exc_info=True)
-        # Conservative fallback: abstain rather than hallucinate
         fallback_assessment = ContextSufficiencyAssessment(
             status="INSUFFICIENT",
             relevance_score=30,

@@ -1,7 +1,5 @@
-# flake8: noqa - prompt templates intentionally contain long lines
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-
 
 class AnswerEvaluation(BaseModel):
     """Evaluation of answer quality."""
@@ -13,11 +11,6 @@ class AnswerEvaluation(BaseModel):
     total_score: int = Field(ge=0, le=100, description="Total quality score")
     feedback: str = Field(description="Brief evaluation feedback")
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 1: Factual Evaluation
-# ──────────────────────────────────────────────────────────────────────────────
-
 FACTUAL_EVALUATION_SYSTEM_PROMPT = """You are an expert answer evaluator for a Retrieval-Augmented Generation (RAG) system.
 Your task is to objectively evaluate a generated answer based on 4 dimensions, each scored from 0 to 25. The maximum total score is 100.
 
@@ -28,10 +21,6 @@ Dimensions:
 4. Relevance (0-25): Does the answer directly address the question without unnecessary tangents?
 
 Provide a detailed evaluation and calculate the final scores. Include brief, constructive feedback on how the answer could be improved."""
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MODE 2: Analytical Evaluation
-# ──────────────────────────────────────────────────────────────────────────────
 
 ANALYTICAL_EVALUATION_SYSTEM_PROMPT = """You are an expert answer evaluator for a document analysis and advisory system.
 The answer is a response to an analytical, advisory, or recommendation question where the LLM uses document content as context but applies its own reasoning and expertise.
@@ -53,7 +42,6 @@ Source Documents:
 
 Generated Answer: {answer}"""
 
-# Default (backward compatible)
 EVALUATION_SYSTEM_PROMPT = FACTUAL_EVALUATION_SYSTEM_PROMPT
 
 EVALUATION_PROMPT = ChatPromptTemplate.from_messages(
